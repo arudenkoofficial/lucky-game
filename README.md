@@ -31,6 +31,10 @@
 - Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
 - Styling with [Tailwind CSS](https://tailwindcss.com)
 - Components with [shadcn/ui](https://ui.shadcn.com/)
+- Architecture: [Feature-Sliced Design (FSD)](https://feature-sliced.design/)
+  - Scalable project structure
+  - Clear separation of concerns
+  - See [docs/SHADCN_FSD_SETUP.md](docs/SHADCN_FSD_SETUP.md) for details
 - Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
   - Environment variables automatically assigned to Vercel project
 
@@ -127,7 +131,17 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
 
    For more details, see [migrations/README.md](migrations/README.md)
 
-7. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+7. **shadcn/ui Configuration**
+
+   This template comes with shadcn/ui configured for Feature-Sliced Design (FSD).
+   All UI components are located in `src/shared/ui/`.
+
+   To add new components:
+   ```bash
+   npx shadcn@latest add button
+   ```
+
+   For detailed information about using shadcn/ui with FSD, see [docs/SHADCN_FSD_SETUP.md](docs/SHADCN_FSD_SETUP.md)
 
 > Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
 
