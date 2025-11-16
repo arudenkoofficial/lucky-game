@@ -1,8 +1,8 @@
-import { DeployButton } from "@/components/deploy-button";
-import { EnvVarWarning } from "@/components/env-var-warning";
-import { AuthButton } from "@/components/auth-button";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { hasEnvVars } from "@/lib/utils";
+import { DeployButton } from "@/features/deploy";
+import { EnvVarWarning } from "@/features/config";
+import { AuthButton } from "@/features/auth";
+import { ThemeSwitcher } from "@/features/theme";
+import { hasEnvVars } from "@/shared/lib/utils";
 import Link from "next/link";
 
 export default function ProtectedLayout({
