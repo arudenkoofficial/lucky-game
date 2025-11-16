@@ -26,6 +26,21 @@
     "paths": {
       "@/*": [
         "./*"
+      ],
+      "@/shared/*": [
+        "./src/shared/*"
+      ],
+      "@/features/*": [
+        "./src/features/*"
+      ],
+      "@/widgets/*": [
+        "./src/widgets/*"
+      ],
+      "@/views/*": [
+        "./src/views/*"
+      ],
+      "@/entities/*": [
+        "./src/entities/*"
       ]
     }
   },

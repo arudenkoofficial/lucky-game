@@ -4,7 +4,7 @@
 
 ## 📋 Project Overview
 
-**Lucky Game** - современное веб-приложение на базе Next.js 15+ с системой аутентификации через Supabase.
+**Lucky Game** - современное веб-приложение на базе Next.js 15+ с системой аутентификации через Supabase, организованное по **FSD (Feature-Sliced Design)** архитектуре.
 
 ### Ключевые возможности:
 - Полная система аутентификации (регистрация, вход, восстановление пароля)
@@ -12,6 +12,7 @@
 - Dark/Light режимы
 - Адаптивный дизайн с Tailwind CSS
 - Готовая UI-библиотека на базе shadcn/ui
+- **FSD архитектура** для масштабируемости
 
 ---
 
@@ -56,61 +57,92 @@
 
 ## 🏗 Architecture
 
-### Directory Structure
+### Directory Structure (FSD Architecture)
 
 ```
 /Users/aleksei/lucky-game/
-├── app/                          # App Router (Next.js 13+)
-│   ├── layout.tsx               # Корневой layout с ThemeProvider
+├── app/                          # Next.js App Router
+│   ├── layout.tsx               # Корневой layout
 │   ├── page.tsx                 # Главная страница
-│   ├── globals.css              # Глобальные стили + Tailwind
-│   ├── auth/                    # Маршруты аутентификации
+│   ├── globals.css              # Глобальные стили
+│   ├── auth/                    # Auth routes
 │   │   ├── login/page.tsx
 │   │   ├── sign-up/page.tsx
 │   │   ├── forgot-password/page.tsx
 │   │   ├── update-password/page.tsx
 │   │   ├── sign-up-success/page.tsx
 │   │   ├── error/page.tsx
-│   │   └── confirm/route.ts     # API route для email подтверждения
-│   └── protected/               # Защищенные маршруты (требуют auth)
-│       ├── layout.tsx           # Layout с навигацией
+│   │   └── confirm/route.ts
+│   └── protected/               # Protected routes
+│       ├── layout.tsx
 │       └── page.tsx
 │
-├── components/                   # React компоненты
-│   ├── auth-button.tsx          # Кнопка авторизации/выхода
-│   ├── login-form.tsx           # Форма входа
-│   ├── sign-up-form.tsx         # Форма регистрации
-│   ├── forgot-password-form.tsx
-│   ├── update-password-form.tsx
-│   ├── hero.tsx
-│   ├── theme-switcher.tsx       # Переключатель темы
-│   ├── ui/                      # shadcn/ui компоненты
-│   │   ├── button.tsx
-│   │   ├── card.tsx
-│   │   ├── input.tsx
-│   │   ├── label.tsx
-│   │   ├── checkbox.tsx
-│   │   ├── dropdown-menu.tsx
-│   │   └── badge.tsx
-│   └── tutorial/                # Tutorial компоненты
-│       ├── tutorial-step.tsx
-│       ├── code-block.tsx
-│       └── ...
+├── src/                          # FSD ARCHITECTURE
+│   ├── shared/                  # Переиспользуемый код
+│   │   ├── ui/                  # UI компоненты (shadcn/ui)
+│   │   │   ├── button/
+│   │   │   ├── card/
+│   │   │   ├── input/
+│   │   │   ├── label/
+│   │   │   ├── checkbox/
+│   │   │   ├── dropdown-menu/
+│   │   │   ├── badge/
+│   │   │   └── index.ts
+│   │   ├── api/                 # API клиенты
+│   │   │   └── supabase/
+│   │   │       ├── client.ts
+│   │   │       ├── server.ts
+│   │   │       ├── middleware.ts
+│   │   │       └── index.ts
+│   │   ├── lib/                 # Утилиты
+│   │   │   ├── utils.ts
+│   │   │   └── index.ts
+│   │   ├── icons/               # Иконки/логотипы
+│   │   │   ├── next-logo.tsx
+│   │   │   ├── supabase-logo.tsx
+│   │   │   └── index.ts
+│   │   └── index.ts
+│   │
+│   ├── features/                # Пользовательские взаимодействия
+│   │   ├── auth/                # Аутентификация
+│   │   │   ├── login-form/
+│   │   │   ├── sign-up-form/
+│   │   │   ├── forgot-password-form/
+│   │   │   ├── update-password-form/
+│   │   │   ├── auth-button/
+│   │   │   ├── logout-button/
+│   │   │   └── index.ts
+│   │   ├── theme/               # Темизация
+│   │   │   ├── theme-switcher/
+│   │   │   └── index.ts
+│   │   ├── deploy/              # Деплой
+│   │   │   ├── deploy-button/
+│   │   │   └── index.ts
+│   │   ├── config/              # Конфигурация
+│   │   │   ├── env-var-warning/
+│   │   │   └── index.ts
+│   │   └── index.ts
+│   │
+│   ├── widgets/                 # Композитные UI блоки
+│   │   ├── hero/
+│   │   ├── code-block/
+│   │   ├── tutorial/
+│   │   │   ├── tutorial-step/
+│   │   │   ├── connect-supabase-steps/
+│   │   │   ├── sign-up-user-steps/
+│   │   │   ├── fetch-data-steps/
+│   │   │   └── index.ts
+│   │   └── index.ts
+│   │
+│   ├── entities/                # Бизнес-сущности (пока не используется)
+│   │
+│   └── views/                   # Композиции страниц (зарезервировано для будущего)
 │
-├── lib/                         # Утилиты и конфигурация
-│   ├── utils.ts                 # Helper функции (cn, hasEnvVars)
-│   └── supabase/               # Supabase клиенты
-│       ├── server.ts            # Server-side клиент
-│       ├── client.ts            # Browser клиент
-│       └── middleware.ts        # Session middleware
-│
-├── middleware.ts                # Next.js middleware (точка входа)
-├── next.config.ts               # Next.js конфигурация
-├── tsconfig.json                # TypeScript настройки
-├── tailwind.config.ts           # Tailwind конфигурация
-├── postcss.config.mjs
-├── eslint.config.mjs
-├── components.json              # shadcn/ui конфигурация
+├── middleware.ts                # Next.js middleware
+├── next.config.ts
+├── tsconfig.json                # С FSD path aliases
+├── tailwind.config.ts
+├── components.json              # Обновлен для src/
 └── package.json
 ```
 
@@ -200,21 +232,39 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 - `.ts` - Утилиты без JSX
 - `.mjs` - ES modules конфигурации (ESLint, PostCSS)
 
-### Import Patterns
+### Import Patterns (FSD)
 
-**Path Alias**:
+**FSD Path Aliases**:
 ```typescript
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+// Shared layer
+import { Button } from "@/shared/ui/button"
+import { cn } from "@/shared/lib/utils"
+import { createServerClient } from "@/shared/api/supabase"
+
+// Features layer
+import { LoginForm, AuthButton } from "@/features/auth"
+import { ThemeSwitcher } from "@/features/theme"
+
+// Widgets layer
+import { Hero } from "@/widgets/hero"
+import { ConnectSupabaseSteps } from "@/widgets/tutorial"
 ```
-- Используйте `@/` для всех импортов
+
+**Правила импорта**:
+- Используйте **barrel exports** (index.ts) для импорта из слоев
 - **Избегайте** относительных путей (`../../../`)
+- Импортируйте из слоя целиком: `@/features/auth`, не из подпапок
 
 **Конфигурация** (tsconfig.json):
 ```json
 {
   "paths": {
-    "@/*": ["./*"]
+    "@/*": ["./*"],
+    "@/shared/*": ["./src/shared/*"],
+    "@/features/*": ["./src/features/*"],
+    "@/widgets/*": ["./src/widgets/*"],
+    "@/views/*": ["./src/views/*"],
+    "@/entities/*": ["./src/entities/*"]
   }
 }
 ```
