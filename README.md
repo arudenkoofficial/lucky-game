@@ -94,7 +94,44 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
 
    The starter kit should now be running on [localhost:3000](http://localhost:3000/).
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+6. **Initialize the Database**
+
+   This project includes automatic database initialization. Choose one of the following options:
+
+   **Option 1: Auto-migration (Easiest)**
+
+   Once your app is running, visit: [http://localhost:3000/api/migrate](http://localhost:3000/api/migrate)
+
+   This will automatically create all necessary tables and policies.
+
+   **Option 2: View SQL Instructions**
+
+   Run this command to see the SQL you need to execute:
+   ```bash
+   npm run db:init
+   ```
+
+   **Option 3: Manual Setup**
+
+   Copy the SQL from the `migrations/` folder and run it in the [Supabase SQL Editor](https://supabase.com/dashboard/project/_/sql/new).
+
+   > [!TIP]
+   > For auto-migration to work, add your service role key to `.env.local`:
+   > ```env
+   > SUPABASE_SERVICE_ROLE_KEY=[YOUR SERVICE ROLE KEY]
+   > ```
+   > Find it in your [Supabase project's API settings](https://supabase.com/dashboard/project/_/settings/api) under "service_role"
+
+   The database initialization will create:
+   - `notes` table (example data from tutorial)
+   - `games` table (for storing game records)
+   - `user_profiles` table (user balance and statistics)
+   - Row Level Security (RLS) policies
+   - Automatic user profile creation on signup
+
+   For more details, see [migrations/README.md](migrations/README.md)
+
+7. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
 
 > Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
 
