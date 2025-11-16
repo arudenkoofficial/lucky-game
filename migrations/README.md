@@ -1,6 +1,6 @@
 # Database Migrations
 
-This directory contains SQL migration files that set up the database schema for the Lucky Game application.
+This directory contains SQL migration files that set up the database schema for the Lucky Game slot machine application.
 
 ## Quick Start
 
@@ -40,59 +40,161 @@ This will display all SQL migrations that you can copy and paste into the Supaba
 Creates the `_migrations` table to track which migrations have been executed.
 
 ### 001_initial_schema.sql
-Creates the main database schema:
-
-- **notes** - Example table with sample data (from tutorial)
-- **games** - Stores game records (game type, bets, results)
-- **user_profiles** - Extended user information (username, balance, statistics)
-- **RLS Policies** - Row Level Security for data protection
-- **Triggers** - Automatic user profile creation on signup
+Creates the main database schema for the slot machine game:
 
 ## Database Schema
 
-### Tables
-
-#### notes
-- `id` - Auto-incrementing ID
-- `title` - Note text
-- `created_at` - Creation timestamp
-
-#### games
-- `id` - UUID primary key
-- `user_id` - Reference to auth.users
-- `game_type` - Type of game played
-- `bet_amount` - Amount wagered
-- `result_amount` - Amount won/lost
-- `status` - Game status
-- `created_at` - When game was played
+### Core Tables
 
 #### user_profiles
-- `id` - UUID (references auth.users)
-- `username` - Unique username
-- `balance` - Current balance (starts at 100.00)
-- `total_games` - Number of games played
-- `total_won` - Total amount won
-- `total_lost` - Total amount lost
-- `created_at` - Profile creation date
-- `updated_at` - Last update timestamp
+Extended user information linked to Supabase Auth.
 
-## Security
+- `id` (uuid) - References auth.users
+- `username` (varchar) - Unique username
+- `coins` (integer) - Virtual currency balance (starts at 1000)
+- `level` (integer) - Player level (starts at 1)
+- `created_at` (timestamptz) - Profile creation date
+- `updated_at` (timestamptz) - Last update timestamp
 
-All tables have Row Level Security (RLS) enabled:
+#### symbols
+Slot machine reel elements.
 
-- Users can only see their own games
-- Users can only update their own profile
-- All profiles are publicly viewable (username, stats only)
-- Notes are publicly readable (example data)
+- `id` (uuid) - Symbol ID
+- `code` (varchar) - Symbol code (CHERRY, SEVEN, DIAMOND, etc.)
+- `display_name` (varchar) - Display name (Вишня, Семёрка, Бриллиант)
+- `rarity` (enum) - COMMON, RARE, EPIC, LEGENDARY
+- `base_value` (integer) - Base value for rewards
+- `created_at` (timestamptz) - Creation timestamp
+
+**Default Symbols:**
+- CHERRY (Вишня) - COMMON, 10 pts
+- LEMON (Лимон) - COMMON, 10 pts
+- ORANGE (Апельсин) - COMMON, 15 pts
+- PLUM (Слива) - RARE, 25 pts
+- BELL (Колокольчик) - RARE, 30 pts
+- STAR (Звезда) - EPIC, 50 pts
+- SEVEN (Семёрка) - EPIC, 75 pts
+- DIAMOND (Бриллиант) - LEGENDARY, 100 pts
+
+#### spin_configurations
+User-configured desired spin outcomes.
+
+- `id` (uuid) - Configuration ID
+- `user_id` (uuid) - References auth.users
+- `desired_combination` (uuid[]) - Array of 3-5 symbol IDs
+- `cost` (integer) - Cost to create this configuration
+- `status` (enum) - DRAFT, ACTIVE, USED
+- `created_at` (timestamptz) - Creation timestamp
+
+#### spins
+Actual spin results.
+
+- `id` (uuid) - Spin ID
+- `user_id` (uuid) - References auth.users
+- `configuration_id` (uuid) - References spin_configurations (nullable)
+- `actual_combination` (uuid[]) - Actual symbol combination result
+- `is_match` (boolean) - Whether it matched the desired configuration
+- `reward` (integer) - Reward amount received
+- `executed_at` (timestamptz) - Execution timestamp
+
+#### game_sessions
+Groups multiple spins into sessions for analytics.
+
+- `id` (uuid) - Session ID
+- `user_id` (uuid) - References auth.users
+- `spins_count` (integer) - Number of spins in session
+- `total_reward` (integer) - Total rewards in session
+- `started_at` (timestamptz) - Session start time
+- `ended_at` (timestamptz) - Session end time (nullable)
+
+### Enumerations
+
+- `symbol_rarity`: COMMON, RARE, EPIC, LEGENDARY
+- `configuration_status`: DRAFT, ACTIVE, USED
+
+### Indexes
+
+For optimized queries:
+- `idx_spins_user_id` - Spins by user
+- `idx_spins_executed_at` - Spins by execution time (DESC)
+- `idx_game_sessions_user_id` - Sessions by user
+- `idx_game_sessions_started_at` - Sessions by start time (DESC)
+
+### Views
+
+#### spin_results_view
+Combines spin data with user information for easy querying.
+
+#### user_stats_view
+Aggregated user statistics:
+- Total spins
+- Successful spins (matches)
+- Total rewards
+- Best single reward
+
+## Row Level Security (RLS)
+
+All tables have RLS enabled with appropriate policies:
+
+### user_profiles
+- **SELECT**: Public (all profiles viewable)
+- **UPDATE**: Own profile only
+- **INSERT**: Own profile only
+
+### symbols
+- **SELECT**: Public (all symbols viewable)
+
+### spin_configurations
+- **SELECT**: Own configurations only
+- **INSERT**: Own configurations only
+- **UPDATE**: Own configurations only
+
+### spins
+- **SELECT**: Own spins only
+- **INSERT**: Own spins only
+
+### game_sessions
+- **SELECT**: Own sessions only
+- **INSERT**: Own sessions only
+- **UPDATE**: Own sessions only
 
 ## Automatic Features
 
 ### User Profile Creation
 When a new user signs up through Supabase Auth, a user profile is automatically created with:
-- Starting balance: $100.00
-- All statistics initialized to 0
+- Starting coins: 1000
+- Starting level: 1
 
-This is handled by the `handle_new_user()` function and trigger.
+This is handled by the `handle_new_user()` function and `on_auth_user_created` trigger.
+
+### Timestamp Updates
+The `user_profiles.updated_at` field is automatically updated on any profile modification via the `handle_updated_at()` function.
+
+## Entity Relationships
+
+```
+User (auth.users)
+  ├─ user_profiles (1:1)
+  ├─ spin_configurations (1:M)
+  ├─ spins (1:M)
+  └─ game_sessions (1:M)
+
+Symbol
+  └─ Used in spin_configurations.desired_combination (M:M)
+  └─ Used in spins.actual_combination (M:M)
+
+SpinConfiguration (1) ──> Spin (1)
+GameSession (1) ──> Spins (M)
+```
+
+## Game Flow
+
+1. **User Registration**: Auto-creates profile with 1000 coins
+2. **Create Configuration**: User spends coins to create desired symbol combination
+3. **Execute Spin**: System generates actual combination, compares with desired
+4. **Calculate Reward**: If match, user receives reward based on symbol values
+5. **Update Profile**: Coins and level updated based on results
+6. **Track Session**: Spins can be grouped into sessions for analytics
 
 ## Troubleshooting
 
@@ -113,7 +215,7 @@ If the auto-migration endpoint doesn't work, use the manual SQL execution method
 ## Adding New Migrations
 
 1. Create a new file with the next number: `002_your_migration_name.sql`
-2. Add your SQL statements
+2. Add your SQL statements (use `IF NOT EXISTS` for idempotency)
 3. Run `npm run db:migrate` to apply
 
 ## Notes
@@ -122,3 +224,4 @@ If the auto-migration endpoint doesn't work, use the manual SQL execution method
 - Each migration is tracked in the `_migrations` table
 - Migrations that have already been executed will be skipped
 - Always test migrations on a development database first
+- Use transactions for complex migrations
