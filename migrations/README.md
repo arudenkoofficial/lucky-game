@@ -209,9 +209,37 @@ The migrations folder should be in your project root. If it's missing, create it
 
 ## Adding New Migrations
 
-1. Create a new file with the next number: `002_your_migration_name.sql`
-2. Add your SQL statements (use `IF NOT EXISTS` for idempotency)
+1. Create a new file with the next number: `003_your_migration_name.sql`
+2. Add your SQL statements following idempotency guidelines (see below)
 3. Run `npm run db:migrate` to apply
+
+### Idempotency Guidelines
+
+**IMPORTANT:** Not all PostgreSQL commands support `IF NOT EXISTS`. Follow these rules:
+
+✅ **Commands that support IF NOT EXISTS:**
+- `CREATE TABLE IF NOT EXISTS`
+- `CREATE INDEX IF NOT EXISTS`
+- `CREATE SCHEMA IF NOT EXISTS`
+- `CREATE EXTENSION IF NOT EXISTS`
+
+❌ **Commands that DO NOT support IF NOT EXISTS:**
+- `CREATE POLICY` - Use DO blocks with exception handling
+- `CREATE TRIGGER` - Check existence with pg_trigger
+- `CREATE TYPE ... AS ENUM` - Use DO blocks with exception handling
+
+**Example - RLS Policy (correct way):**
+
+```sql
+DO $$ BEGIN
+  CREATE POLICY "Policy name" ON table_name
+    FOR SELECT USING (true);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
+```
+
+For detailed migration guidelines, see [PostgreSQL Migration Guidelines](../docs/POSTGRESQL_MIGRATION_GUIDELINES.md).
 
 ## Notes
 
@@ -220,3 +248,4 @@ The migrations folder should be in your project root. If it's missing, create it
 - Migrations that have already been executed will be skipped
 - Always test migrations on a development database first
 - Use transactions for complex migrations
+- **All migrations must be idempotent** - they should be safe to run multiple times
