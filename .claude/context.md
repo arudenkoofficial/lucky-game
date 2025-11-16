@@ -154,10 +154,6 @@
 │   ├── 001_initial_schema.sql  # Initial slot machine schema
 │   └── 002_backfill_existing_users.sql # Backfill for existing auth users
 │
-├── scripts/                     # CLI scripts
-│   ├── init-database.js         # Show migration SQL
-│   └── check-migrations.js      # Check migration status
-│
 ├── middleware.ts                # Next.js middleware
 ├── next.config.ts               # Next.js конфигурация
 ├── tsconfig.json                # TypeScript настройки + FSD path aliases
@@ -377,24 +373,10 @@ GameSession (1) ──> Spins (M)
 - Выполняются в алфавитном порядке
 - Отслеживание в таблице `_migrations`
 
-**Способы выполнения**:
-
-1. **CLI просмотр SQL** (рекомендуется):
-   ```bash
-   npm run db:init
-   ```
-   Показывает SQL для копирования в Supabase SQL Editor
-
-2. **Проверка статуса**:
-   ```bash
-   npm run db:migrate
-   ```
-   Проверяет конфигурацию и показывает инструкции
-
-3. **Ручное выполнение**:
-   - Скопируйте SQL из `migrations/`
-   - Вставьте в [Supabase SQL Editor](https://supabase.com/dashboard/project/_/sql/new)
-   - Выполните
+**Способ выполнения**:
+- Скопируйте SQL из `migrations/`
+- Вставьте в [Supabase SQL Editor](https://supabase.com/dashboard/project/_/sql/new)
+- Выполните миграции по порядку (000, 001, и т.д.)
 
 **Важно**:
 - Миграции идемпотентны (`IF NOT EXISTS`)
@@ -658,21 +640,7 @@ export async function GET() {
    # Заполните NEXT_PUBLIC_SUPABASE_URL и NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
    ```
 
-2. **Выберите способ миграции**:
-
-   **Вариант A: CLI просмотр** (рекомендуется)
-   ```bash
-   npm run db:init
-   # Скопируйте SQL и выполните в Supabase Dashboard
-   ```
-
-   **Вариант B: Проверка статуса**
-   ```bash
-   npm run db:migrate
-   # Показывает статус и инструкции
-   ```
-
-   **Вариант C: Ручное выполнение**
+2. **Выполните миграции**:
    - Откройте файлы в `migrations/` folder
    - Скопируйте SQL в Supabase SQL Editor
    - Выполните миграции по порядку (000, 001, и т.д.)
@@ -711,13 +679,9 @@ export async function GET() {
    ```
 
 3. **Выполните миграцию**:
-   ```bash
-   # Через API
-   # Откройте: http://localhost:3000/api/migrate
-
-   # Или вручную через Supabase Dashboard
-   npm run db:init
-   ```
+   - Скопируйте SQL из файла миграции
+   - Вставьте в Supabase SQL Editor
+   - Выполните
 
 **Best practices для миграций**:
 - Используйте `IF NOT EXISTS` для идемпотентности
@@ -816,12 +780,9 @@ theme: {
 | `lib/utils.ts` | Helper функции (`cn`, `hasEnvVars`) |
 | `lib/supabase/server.ts` | Server-side Supabase клиент |
 | `lib/supabase/client.ts` | Browser Supabase клиент |
-| `lib/migrations/run-migrations.ts` | Утилита запуска миграций |
-| `app/api/migrate/route.ts` | API endpoint для автоматических миграций |
 | `components/database-status.tsx` | UI индикатор статуса БД |
 | `migrations/001_initial_schema.sql` | Основная схема БД |
 | `migrations/README.md` | Документация по миграциям |
-| `scripts/init-database.js` | CLI для просмотра миграций |
 | `tailwind.config.ts` | Конфигурация темы и цветов |
 | `components.json` | shadcn/ui настройки |
 
@@ -837,10 +798,6 @@ npm start            # Запуск production
 
 # Linting
 npm run lint         # ESLint проверка
-
-# Database
-npm run db:init      # Показать SQL миграций
-npm run db:migrate   # Проверить статус миграций
 
 # shadcn/ui
 npx shadcn@latest add [component]  # Добавить UI компонент

@@ -76,14 +76,7 @@ export function DatabaseStatus() {
               </code>
             </div>
             <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded">
-              <p className="font-medium mb-1">Option 2: View SQL</p>
-              <p className="text-sm mb-2">Run this command in your terminal:</p>
-              <code className="text-xs bg-yellow-200 dark:bg-yellow-900 px-2 py-1 rounded">
-                npm run db:init
-              </code>
-            </div>
-            <div className="bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded">
-              <p className="font-medium mb-1">Option 3: Manual Setup</p>
+              <p className="font-medium mb-1">Option 2: Manual Setup</p>
               <p className="text-sm mb-2">Copy SQL from migrations folder to Supabase SQL Editor</p>
               <a
                 href="https://supabase.com/dashboard/project/_/sql/new"
