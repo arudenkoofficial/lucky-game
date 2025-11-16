@@ -4,17 +4,7 @@ This directory contains SQL migration files that set up the database schema for 
 
 ## Quick Start
 
-### Option 1: View SQL with CLI (Recommended)
-
-Run the initialization script to see the SQL commands:
-
-```bash
-npm run db:init
-```
-
-This will display all SQL migrations that you can copy and paste into the Supabase SQL Editor.
-
-### Option 2: Manual SQL Execution
+### Manual SQL Execution
 
 1. Go to [Supabase SQL Editor](https://supabase.com/dashboard/project/_/sql/new)
 2. Copy the contents of each migration file in order:
@@ -211,7 +201,7 @@ The migrations folder should be in your project root. If it's missing, create it
 
 1. Create a new file with the next number: `003_your_migration_name.sql`
 2. Add your SQL statements following idempotency guidelines (see below)
-3. Run `npm run db:migrate` to apply
+3. Execute the migration in Supabase SQL Editor
 
 ### Idempotency Guidelines
 

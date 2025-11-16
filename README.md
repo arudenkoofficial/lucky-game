@@ -104,18 +104,7 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
 
 6. **Initialize the Database**
 
-   This project includes database migration scripts. Choose one of the following options:
-
-   **Option 1: View SQL with CLI (Recommended)**
-
-   Run this command to see the SQL you need to execute:
-   ```bash
-   npm run db:init
-   ```
-
-   This will display all SQL migrations. Copy and paste them into the Supabase SQL Editor.
-
-   **Option 2: Manual Setup**
+   This project includes database migration scripts. To set up your database:
 
    1. Go to [Supabase SQL Editor](https://supabase.com/dashboard/project/_/sql/new)
    2. Copy the SQL from the `migrations/` folder (in order: 000, 001, etc.)
