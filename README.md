@@ -13,6 +13,7 @@
   <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
   <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
   <a href="SETUP.md"><strong>📖 Detailed Setup Guide (RU)</strong></a> ·
+  <a href="docs/POSTGRESQL_MIGRATION_GUIDELINES.md"><strong>🗄️ PostgreSQL Migration Guidelines</strong></a> ·
   <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
   <a href="#more-supabase-examples"><strong>More Examples</strong></a>
 </p>
@@ -130,6 +131,8 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
    - Automatic user profile creation on signup (1000 coins, level 1)
 
    For more details, see [migrations/README.md](migrations/README.md)
+
+   > **💡 Writing Migrations?** Check out the [PostgreSQL Migration Guidelines](docs/POSTGRESQL_MIGRATION_GUIDELINES.md) to learn about idempotent migrations and avoid common PostgreSQL syntax errors.
 
 7. **shadcn/ui Configuration**
 
