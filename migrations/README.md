@@ -21,6 +21,7 @@ This will display all SQL migrations that you can copy and paste into the Supaba
    - `000_migrations_table.sql`
    - `001_initial_schema.sql`
    - `002_backfill_existing_users.sql` (only if you have existing users)
+   - `003_enable_rls_migrations.sql` (security: enable RLS for _migrations table)
 3. Paste into the SQL Editor and click **RUN**
 
 ## Migration Files
@@ -40,6 +41,17 @@ Creates user profiles for any existing authenticated users who don't have a prof
 - Is safe to run multiple times (uses `ON CONFLICT DO NOTHING`)
 
 **When to use:** If you're adding this migration system to an existing project with registered users, run this migration to ensure all users have profiles.
+
+### 003_enable_rls_migrations.sql
+**Security enhancement for _migrations table.**
+
+Enables Row Level Security (RLS) for the `_migrations` table to follow Supabase best practices:
+- Enables RLS on `_migrations` table
+- Adds read-only policy (anyone can SELECT)
+- Blocks INSERT/UPDATE/DELETE via API (only SQL Editor or service role can modify)
+- Removes "Data is publicly accessible via API as RLS is disabled" warning
+
+**When to use:** Run this migration after `000_migrations_table.sql` to secure the migrations table. Safe to run anytime.
 
 ## Database Schema
 
