@@ -5,9 +5,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint app src middleware.ts",
-    "lint:fix": "eslint app src middleware.ts --fix",
-    "db:init": "node scripts/init-database.js",
-    "db:migrate": "node scripts/check-migrations.js"
+    "lint:fix": "eslint app src middleware.ts --fix"
   },
   "dependencies": {
     "@radix-ui/react-checkbox": "^1.3.1",
