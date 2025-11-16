@@ -4,19 +4,7 @@ This directory contains SQL migration files that set up the database schema for 
 
 ## Quick Start
 
-### Option 1: Automated Setup (Easiest)
-
-1. Make sure your `.env.local` file has your Supabase credentials
-2. Start the development server:
-   ```bash
-   npm run dev
-   ```
-3. Visit the migration endpoint:
-   ```
-   http://localhost:3000/api/migrate
-   ```
-
-### Option 2: View SQL Instructions
+### Option 1: View SQL with CLI (Recommended)
 
 Run the initialization script to see the SQL commands:
 
@@ -26,7 +14,7 @@ npm run db:init
 
 This will display all SQL migrations that you can copy and paste into the Supabase SQL Editor.
 
-### Option 3: Manual SQL Execution
+### Option 2: Manual SQL Execution
 
 1. Go to [Supabase SQL Editor](https://supabase.com/dashboard/project/_/sql/new)
 2. Copy the contents of each migration file in order:
@@ -203,14 +191,10 @@ Make sure your `.env.local` file contains:
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-anon-key
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
 
 ### "Migrations directory not found"
 The migrations folder should be in your project root. If it's missing, create it and add the SQL files.
-
-### "Cannot execute migrations"
-If the auto-migration endpoint doesn't work, use the manual SQL execution method via the Supabase Dashboard.
 
 ## Adding New Migrations
 

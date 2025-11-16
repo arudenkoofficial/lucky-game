@@ -217,10 +217,6 @@ NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 ```
 
-Опционально (для автоматических миграций):
-```bash
-SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
-```
 
 ### Database Schema & Migrations
 
@@ -383,27 +379,19 @@ GameSession (1) ──> Spins (M)
 
 **Способы выполнения**:
 
-1. **Автоматическая миграция** (через API):
-   ```bash
-   # Запустите dev сервер
-   npm run dev
-   # Откройте: http://localhost:3000/api/migrate
-   ```
-   Требуется: `SUPABASE_SERVICE_ROLE_KEY` в `.env.local`
-
-2. **CLI просмотр SQL**:
+1. **CLI просмотр SQL** (рекомендуется):
    ```bash
    npm run db:init
    ```
    Показывает SQL для копирования в Supabase SQL Editor
 
-3. **Проверка статуса**:
+2. **Проверка статуса**:
    ```bash
    npm run db:migrate
    ```
    Проверяет конфигурацию и показывает инструкции
 
-4. **Ручное выполнение**:
+3. **Ручное выполнение**:
    - Скопируйте SQL из `migrations/`
    - Вставьте в [Supabase SQL Editor](https://supabase.com/dashboard/project/_/sql/new)
    - Выполните
@@ -672,24 +660,22 @@ export async function GET() {
 
 2. **Выберите способ миграции**:
 
-   **Вариант A: Автоматическая миграция (рекомендуется)**
-   ```bash
-   # Добавьте SUPABASE_SERVICE_ROLE_KEY в .env.local
-   npm run dev
-   # Откройте: http://localhost:3000/api/migrate
-   ```
-
-   **Вариант B: CLI просмотр**
+   **Вариант A: CLI просмотр** (рекомендуется)
    ```bash
    npm run db:init
    # Скопируйте SQL и выполните в Supabase Dashboard
    ```
 
-   **Вариант C: Проверка статуса**
+   **Вариант B: Проверка статуса**
    ```bash
    npm run db:migrate
    # Показывает статус и инструкции
    ```
+
+   **Вариант C: Ручное выполнение**
+   - Откройте файлы в `migrations/` folder
+   - Скопируйте SQL в Supabase SQL Editor
+   - Выполните миграции по порядку (000, 001, и т.д.)
 
 3. **Проверьте создание таблиц**:
    - Откройте Supabase Dashboard > Table Editor
