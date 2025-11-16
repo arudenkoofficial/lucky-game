@@ -12,6 +12,7 @@
   <a href="#demo"><strong>Demo</strong></a> ·
   <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
   <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
+  <a href="SETUP.md"><strong>📖 Detailed Setup Guide (RU)</strong></a> ·
   <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
   <a href="#more-supabase-examples"><strong>More Examples</strong></a>
 </p>
@@ -50,6 +51,8 @@ The above will also clone the Starter kit to your GitHub, you can clone that loc
 If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
 
 ## Clone and run locally
+
+> **📖 Ищете подробное руководство на русском?** См. [SETUP.md](SETUP.md) для детальных инструкций по первому запуску и работе с миграциями.
 
 1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
 
@@ -94,7 +97,37 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
 
    The starter kit should now be running on [localhost:3000](http://localhost:3000/).
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+6. **Initialize the Database**
+
+   This project includes database migration scripts. Choose one of the following options:
+
+   **Option 1: View SQL with CLI (Recommended)**
+
+   Run this command to see the SQL you need to execute:
+   ```bash
+   npm run db:init
+   ```
+
+   This will display all SQL migrations. Copy and paste them into the Supabase SQL Editor.
+
+   **Option 2: Manual Setup**
+
+   1. Go to [Supabase SQL Editor](https://supabase.com/dashboard/project/_/sql/new)
+   2. Copy the SQL from the `migrations/` folder (in order: 000, 001, etc.)
+   3. Paste and execute in the SQL Editor
+
+   The database initialization will create:
+   - `user_profiles` table (username, coins, level)
+   - `symbols` table (slot machine symbols with rarity)
+   - `spin_configurations` table (user-configured desired outcomes)
+   - `spins` table (actual spin results with rewards)
+   - `game_sessions` table (grouping spins for analytics)
+   - Row Level Security (RLS) policies
+   - Automatic user profile creation on signup (1000 coins, level 1)
+
+   For more details, see [migrations/README.md](migrations/README.md)
+
+7. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
 
 > Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
 
