@@ -64,8 +64,11 @@
 ├── app/                          # Next.js App Router
 │   ├── layout.tsx               # Корневой layout
 │   ├── page.tsx                 # Главная страница
-│   ├── globals.css              # Глобальные стили
-│   ├── auth/                    # Auth routes
+│   ├── globals.css              # Глобальные стили + Tailwind
+│   ├── api/                     # API Routes
+│   │   └── migrate/             # Database migration endpoint (удалён позже)
+│   │       └── route.ts         # Auto-migration API (удалён позже)
+│   ├── auth/                    # Маршруты аутентификации
 │   │   ├── login/page.tsx
 │   │   ├── sign-up/page.tsx
 │   │   ├── forgot-password/page.tsx
@@ -126,6 +129,9 @@
 │   ├── widgets/                 # Композитные UI блоки
 │   │   ├── hero/
 │   │   ├── code-block/
+│   │   ├── database-status/     # Database status indicator
+│   │   │   ├── database-status.tsx
+│   │   │   └── index.ts
 │   │   ├── tutorial/
 │   │   │   ├── tutorial-step/
 │   │   │   ├── connect-supabase-steps/
@@ -138,11 +144,27 @@
 │   │
 │   └── views/                   # Композиции страниц (зарезервировано для будущего)
 │
+├── lib/                         # (Legacy) Будет перемещено в src/
+│   └── migrations/              # Database migration utilities (удалено позже)
+│       └── run-migrations.ts    # Migration runner (удалено позже)
+│
+├── migrations/                  # SQL Database migrations
+│   ├── README.md               # Migration documentation
+│   ├── 000_migrations_table.sql # Migration tracking table
+│   ├── 001_initial_schema.sql  # Initial slot machine schema
+│   └── 002_backfill_existing_users.sql # Backfill for existing auth users
+│
+├── scripts/                     # CLI scripts
+│   ├── init-database.js         # Show migration SQL
+│   └── check-migrations.js      # Check migration status
+│
 ├── middleware.ts                # Next.js middleware
-├── next.config.ts
-├── tsconfig.json                # С FSD path aliases
-├── tailwind.config.ts
-├── components.json              # Обновлен для src/
+├── next.config.ts               # Next.js конфигурация
+├── tsconfig.json                # TypeScript настройки + FSD path aliases
+├── tailwind.config.ts           # Tailwind конфигурация
+├── postcss.config.mjs
+├── eslint.config.mjs
+├── components.json              # shadcn/ui конфигурация (обновлен для src/)
 └── package.json
 ```
 
@@ -194,6 +216,111 @@ updateSession() // Проверяет сессию, обновляет cookies
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 ```
+
+Опционально (для автоматических миграций):
+```bash
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
+```
+
+### Database Schema & Migrations
+
+#### Database Tables
+
+**notes** - Пример таблицы из туториала:
+- `id` (bigserial) - Auto-incrementing ID
+- `title` (text) - Текст заметки
+- `created_at` (timestamptz) - Дата создания
+
+**games** - Записи игровых сессий:
+- `id` (uuid) - UUID primary key
+- `user_id` (uuid) - Ссылка на auth.users
+- `game_type` (varchar) - Тип игры
+- `bet_amount` (numeric) - Размер ставки
+- `result_amount` (numeric) - Результат (выигрыш/проигрыш)
+- `status` (varchar) - Статус игры
+- `created_at` (timestamptz) - Время игры
+
+**user_profiles** - Расширенные профили пользователей:
+- `id` (uuid) - Ссылка на auth.users (PK)
+- `username` (varchar) - Уникальное имя пользователя
+- `balance` (numeric) - Текущий баланс (начальный: $100.00)
+- `total_games` (integer) - Количество игр
+- `total_won` (numeric) - Общая сумма выигрышей
+- `total_lost` (numeric) - Общая сумма проигрышей
+- `created_at` (timestamptz) - Дата создания профиля
+- `updated_at` (timestamptz) - Последнее обновление
+
+**_migrations** - Служебная таблица для отслеживания миграций:
+- `id` (serial) - Auto-incrementing ID
+- `name` (varchar) - Имя файла миграции
+- `executed_at` (timestamptz) - Время выполнения
+
+#### Row Level Security (RLS)
+
+Все таблицы защищены RLS политиками:
+
+**notes**:
+- `Allow public read access` - Публичный доступ на чтение
+
+**games**:
+- `Users can view own games` - Пользователи видят только свои игры
+- `Users can insert own games` - Пользователи могут создавать свои игры
+
+**user_profiles**:
+- `Public profiles are viewable` - Все профили публично видимы
+- `Users can update own profile` - Пользователи могут обновлять только свой профиль
+- `Users can insert own profile` - Пользователи могут создавать только свой профиль
+
+#### Automatic Features
+
+**Триггеры и функции**:
+
+`handle_new_user()` - Автоматическое создание профиля пользователя при регистрации:
+- Создает запись в `user_profiles`
+- Устанавливает начальный баланс $100.00
+- Инициализирует статистику нулями
+
+**Триггер**: `on_auth_user_created` на таблице `auth.users`
+
+#### Migration System
+
+**Структура миграций**:
+- Миграции в папке `migrations/`
+- Именование: `XXX_description.sql` (например, `001_initial_schema.sql`)
+- Выполняются в алфавитном порядке
+- Отслеживание в таблице `_migrations`
+
+**Способы выполнения**:
+
+1. **Автоматическая миграция** (через API):
+   ```bash
+   # Запустите dev сервер
+   npm run dev
+   # Откройте: http://localhost:3000/api/migrate
+   ```
+   Требуется: `SUPABASE_SERVICE_ROLE_KEY` в `.env.local`
+
+2. **CLI просмотр SQL**:
+   ```bash
+   npm run db:init
+   ```
+   Показывает SQL для копирования в Supabase SQL Editor
+
+3. **Проверка статуса**:
+   ```bash
+   npm run db:migrate
+   ```
+   Проверяет конфигурацию и показывает инструкции
+
+4. **Ручное выполнение**:
+   - Скопируйте SQL из `migrations/`
+   - Вставьте в [Supabase SQL Editor](https://supabase.com/dashboard/project/_/sql/new)
+   - Выполните
+
+**Важно**:
+- Миграции идемпотентны (`IF NOT EXISTS`)
+- Уже выполненные миграции пропускаются
+- Детальная документация в `migrations/README.md`
 
 ### Theme System
 
@@ -442,6 +569,86 @@ export async function GET() {
 }
 ```
 
+### Инициализация базы данных
+
+**Первый запуск проекта**:
+
+1. **Настройте переменные окружения**:
+   ```bash
+   cp .env.example .env.local
+   # Заполните NEXT_PUBLIC_SUPABASE_URL и NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+   ```
+
+2. **Выберите способ миграции**:
+
+   **Вариант A: Автоматическая миграция (рекомендуется)**
+   ```bash
+   # Добавьте SUPABASE_SERVICE_ROLE_KEY в .env.local
+   npm run dev
+   # Откройте: http://localhost:3000/api/migrate
+   ```
+
+   **Вариант B: CLI просмотр**
+   ```bash
+   npm run db:init
+   # Скопируйте SQL и выполните в Supabase Dashboard
+   ```
+
+   **Вариант C: Проверка статуса**
+   ```bash
+   npm run db:migrate
+   # Показывает статус и инструкции
+   ```
+
+3. **Проверьте создание таблиц**:
+   - Откройте Supabase Dashboard > Table Editor
+   - Должны быть видны: `notes`, `games`, `user_profiles`, `_migrations`
+
+**Индикатор статуса БД**:
+- Компонент `<DatabaseStatus />` на главной странице
+- Автоматически проверяет наличие таблиц
+- Показывает инструкции по инициализации при необходимости
+
+### Создание новой миграции
+
+1. **Создайте файл миграции**:
+   ```bash
+   # Формат: XXX_description.sql
+   touch migrations/002_add_feature.sql
+   ```
+
+2. **Напишите SQL**:
+   ```sql
+   -- migrations/002_add_feature.sql
+   CREATE TABLE IF NOT EXISTS my_new_table (
+     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+     name text NOT NULL,
+     created_at timestamptz DEFAULT now()
+   );
+
+   ALTER TABLE my_new_table ENABLE ROW LEVEL SECURITY;
+
+   CREATE POLICY "policy_name" ON my_new_table
+     FOR SELECT
+     USING (true);
+   ```
+
+3. **Выполните миграцию**:
+   ```bash
+   # Через API
+   # Откройте: http://localhost:3000/api/migrate
+
+   # Или вручную через Supabase Dashboard
+   npm run db:init
+   ```
+
+**Best practices для миграций**:
+- Используйте `IF NOT EXISTS` для идемпотентности
+- Всегда включайте RLS (`ENABLE ROW LEVEL SECURITY`)
+- Создавайте политики доступа для новых таблиц
+- Документируйте SQL комментариями
+- Тестируйте на dev базе перед production
+
 ### Добавление защищенного маршрута
 
 **Автоматическая защита**:
@@ -532,6 +739,12 @@ theme: {
 | `lib/utils.ts` | Helper функции (`cn`, `hasEnvVars`) |
 | `lib/supabase/server.ts` | Server-side Supabase клиент |
 | `lib/supabase/client.ts` | Browser Supabase клиент |
+| `lib/migrations/run-migrations.ts` | Утилита запуска миграций |
+| `app/api/migrate/route.ts` | API endpoint для автоматических миграций |
+| `components/database-status.tsx` | UI индикатор статуса БД |
+| `migrations/001_initial_schema.sql` | Основная схема БД |
+| `migrations/README.md` | Документация по миграциям |
+| `scripts/init-database.js` | CLI для просмотра миграций |
 | `tailwind.config.ts` | Конфигурация темы и цветов |
 | `components.json` | shadcn/ui настройки |
 
@@ -548,6 +761,10 @@ npm start            # Запуск production
 # Linting
 npm run lint         # ESLint проверка
 
+# Database
+npm run db:init      # Показать SQL миграций
+npm run db:migrate   # Проверить статус миграций
+
 # shadcn/ui
 npx shadcn@latest add [component]  # Добавить UI компонент
 ```
@@ -558,7 +775,16 @@ npx shadcn@latest add [component]  # Добавить UI компонент
 # .env.local (создайте файл)
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-anon-key
+
+# Опционально: для автоматических миграций (development only)
+SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ```
+
+**Где найти ключи:**
+- Project Settings > API в Supabase Dashboard
+- `NEXT_PUBLIC_SUPABASE_URL` - Project URL
+- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` - anon/public key
+- `SUPABASE_SERVICE_ROLE_KEY` - service_role key (держите в секрете!)
 
 ---
 
@@ -571,6 +797,9 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-anon-key
 5. **Supabase клиенты** - создавайте per-request, не глобально
 6. **shadcn/ui** - используйте готовые компоненты вместо создания с нуля
 7. **CSS Variables** - для семантических цветов вместо hardcoded значений
+8. **Database Migrations** - всегда используйте `IF NOT EXISTS` для идемпотентности
+9. **Row Level Security** - включайте RLS для всех новых таблиц
+10. **Service Role Key** - храните в `.env.local`, НИКОГДА не коммитьте в git
 
 ---
 
@@ -581,6 +810,19 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-anon-key
 - [shadcn/ui Docs](https://ui.shadcn.com)
 - [Tailwind CSS Docs](https://tailwindcss.com/docs)
 - [Radix UI Docs](https://www.radix-ui.com/primitives/docs)
+
+---
+
+## 📝 Changelog
+
+### 2025-11-16 - Database & Migrations
+- Добавлена система автоматической инициализации БД
+- SQL миграции для `notes`, `games`, `user_profiles`
+- API endpoint `/api/migrate` для автоматических миграций
+- CLI скрипты: `db:init`, `db:migrate`
+- Компонент `<DatabaseStatus />` для отображения статуса БД
+- Row Level Security (RLS) политики для всех таблиц
+- Автоматическое создание профиля пользователя при регистрации
 
 ---
 
