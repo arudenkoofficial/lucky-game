@@ -12,6 +12,7 @@
   <a href="#demo"><strong>Demo</strong></a> ·
   <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
   <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
+  <a href="SETUP.md"><strong>📖 Detailed Setup Guide (RU)</strong></a> ·
   <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
   <a href="#more-supabase-examples"><strong>More Examples</strong></a>
 </p>
@@ -50,6 +51,8 @@ The above will also clone the Starter kit to your GitHub, you can clone that loc
 If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
 
 ## Clone and run locally
+
+> **📖 Ищете подробное руководство на русском?** См. [SETUP.md](SETUP.md) для детальных инструкций по первому запуску и работе с миграциями.
 
 1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
 
