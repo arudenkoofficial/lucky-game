@@ -10,9 +10,9 @@ This directory contains SQL migration files that set up the database schema for 
 2. Copy the contents of each migration file in order:
    - `000_migrations_table.sql`
    - `001_initial_schema.sql`
-   - `002_fix_view_security.sql` (CRITICAL - fixes security vulnerability)
+   - `002_backfill_existing_users.sql` (only if you have existing users)
    - `003_enable_rls_migrations_table.sql`
-   - `004_backfill_existing_users.sql` (only if you have existing users)
+   - `004_fix_view_security.sql` (CRITICAL - fixes security vulnerability)
 3. Paste into the SQL Editor and click **RUN**
 
 ## Migration Files
@@ -23,7 +23,20 @@ Creates the `_migrations` table to track which migrations have been executed.
 ### 001_initial_schema.sql
 Creates the main database schema for the slot machine game.
 
-### 002_fix_view_security.sql
+### 002_backfill_existing_users.sql
+**Only needed if you have existing users in auth.users.**
+
+Creates user profiles for any existing authenticated users who don't have a profile yet. This migration:
+- Finds all users in `auth.users` without a corresponding `user_profiles` record
+- Creates profiles for them with 1000 coins and level 1
+- Is safe to run multiple times (uses `ON CONFLICT DO NOTHING`)
+
+**When to use:** If you're adding this migration system to an existing project with registered users, run this migration to ensure all users have profiles.
+
+### 003_enable_rls_migrations_table.sql
+Protects the internal migrations tracking table from public API access by enabling RLS without any policies. This ensures only the service_role can access it.
+
+### 004_fix_view_security.sql
 **CRITICAL SECURITY FIX** - Fixes security vulnerability in views.
 
 This migration addresses a critical security issue where `spin_results_view` and `user_stats_view` were bypassing Row Level Security (RLS) policies. Without this fix, all user data is publicly accessible via API.
@@ -36,19 +49,6 @@ This migration addresses a critical security issue where `spin_results_view` and
 **Impact:**
 - Before: Anyone could query all users' spins, rewards, and statistics
 - After: Users can only see their own data, respecting RLS policies
-
-### 003_enable_rls_migrations_table.sql
-Protects the internal migrations tracking table from public API access by enabling RLS without any policies. This ensures only the service_role can access it.
-
-### 004_backfill_existing_users.sql
-**Only needed if you have existing users in auth.users.**
-
-Creates user profiles for any existing authenticated users who don't have a profile yet. This migration:
-- Finds all users in `auth.users` without a corresponding `user_profiles` record
-- Creates profiles for them with 1000 coins and level 1
-- Is safe to run multiple times (uses `ON CONFLICT DO NOTHING`)
-
-**When to use:** If you're adding this migration system to an existing project with registered users, run this migration to ensure all users have profiles.
 
 ## Database Schema
 
