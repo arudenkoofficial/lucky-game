@@ -17,19 +17,31 @@ CREATE TABLE IF NOT EXISTS user_profiles (
 ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 
 -- Users can view all profiles
-CREATE POLICY IF NOT EXISTS "Public profiles are viewable" ON user_profiles
-  FOR SELECT
-  USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Public profiles are viewable" ON user_profiles
+    FOR SELECT
+    USING (true);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Users can only update their own profile
-CREATE POLICY IF NOT EXISTS "Users can update own profile" ON user_profiles
-  FOR UPDATE
-  USING (auth.uid() = id);
+DO $$ BEGIN
+  CREATE POLICY "Users can update own profile" ON user_profiles
+    FOR UPDATE
+    USING (auth.uid() = id);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Users can insert their own profile
-CREATE POLICY IF NOT EXISTS "Users can insert own profile" ON user_profiles
-  FOR INSERT
-  WITH CHECK (auth.uid() = id);
+DO $$ BEGIN
+  CREATE POLICY "Users can insert own profile" ON user_profiles
+    FOR INSERT
+    WITH CHECK (auth.uid() = id);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ============================================================================
 -- Symbols Table - Элементы игрового барабана
@@ -54,9 +66,13 @@ CREATE TABLE IF NOT EXISTS symbols (
 -- Enable RLS for symbols (public read)
 ALTER TABLE symbols ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY IF NOT EXISTS "Symbols are publicly viewable" ON symbols
-  FOR SELECT
-  USING (true);
+DO $$ BEGIN
+  CREATE POLICY "Symbols are publicly viewable" ON symbols
+    FOR SELECT
+    USING (true);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Insert default symbols
 INSERT INTO symbols (code, display_name, rarity, base_value)
@@ -95,19 +111,31 @@ CREATE TABLE IF NOT EXISTS spin_configurations (
 ALTER TABLE spin_configurations ENABLE ROW LEVEL SECURITY;
 
 -- Users can only see their own configurations
-CREATE POLICY IF NOT EXISTS "Users can view own configurations" ON spin_configurations
-  FOR SELECT
-  USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users can view own configurations" ON spin_configurations
+    FOR SELECT
+    USING (auth.uid() = user_id);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Users can insert their own configurations
-CREATE POLICY IF NOT EXISTS "Users can insert own configurations" ON spin_configurations
-  FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users can insert own configurations" ON spin_configurations
+    FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Users can update their own configurations
-CREATE POLICY IF NOT EXISTS "Users can update own configurations" ON spin_configurations
-  FOR UPDATE
-  USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users can update own configurations" ON spin_configurations
+    FOR UPDATE
+    USING (auth.uid() = user_id);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ============================================================================
 -- Spins Table - Результаты спинов
@@ -131,14 +159,22 @@ CREATE INDEX IF NOT EXISTS idx_spins_executed_at ON spins(executed_at DESC);
 ALTER TABLE spins ENABLE ROW LEVEL SECURITY;
 
 -- Users can only see their own spins
-CREATE POLICY IF NOT EXISTS "Users can view own spins" ON spins
-  FOR SELECT
-  USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users can view own spins" ON spins
+    FOR SELECT
+    USING (auth.uid() = user_id);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Users can insert their own spins
-CREATE POLICY IF NOT EXISTS "Users can insert own spins" ON spins
-  FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users can insert own spins" ON spins
+    FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ============================================================================
 -- Game Sessions Table - Группировка спинов в сессии
@@ -161,19 +197,31 @@ CREATE INDEX IF NOT EXISTS idx_game_sessions_started_at ON game_sessions(started
 ALTER TABLE game_sessions ENABLE ROW LEVEL SECURITY;
 
 -- Users can only see their own sessions
-CREATE POLICY IF NOT EXISTS "Users can view own sessions" ON game_sessions
-  FOR SELECT
-  USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users can view own sessions" ON game_sessions
+    FOR SELECT
+    USING (auth.uid() = user_id);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Users can insert their own sessions
-CREATE POLICY IF NOT EXISTS "Users can insert own sessions" ON game_sessions
-  FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users can insert own sessions" ON game_sessions
+    FOR INSERT
+    WITH CHECK (auth.uid() = user_id);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- Users can update their own sessions
-CREATE POLICY IF NOT EXISTS "Users can update own sessions" ON game_sessions
-  FOR UPDATE
-  USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users can update own sessions" ON game_sessions
+    FOR UPDATE
+    USING (auth.uid() = user_id);
+EXCEPTION
+  WHEN duplicate_object THEN NULL;
+END $$;
 
 -- ============================================================================
 -- Triggers and Functions
