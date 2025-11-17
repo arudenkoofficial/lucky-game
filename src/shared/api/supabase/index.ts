@@ -1,3 +1,4 @@
 export { createClient } from "./client";
-export { createClient as createServerClient } from "./server";
-export { updateSession } from "./middleware";
+// Server-only exports should be imported directly from their respective files
+// export { createClient as createServerClient } from "./server";
+// export { updateSession } from "./middleware";
