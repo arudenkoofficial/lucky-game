@@ -6,8 +6,10 @@
 -- Enable Row Level Security on the migrations table
 ALTER TABLE _migrations ENABLE ROW LEVEL SECURITY;
 
--- No policies are created intentionally:
--- - This is an internal/service table
--- - Should not be accessible via public API
--- - Only service_role (backend) should interact with it
--- - RLS with no policies = complete public access denial
+-- Allow public read access to check database status
+-- Write operations remain blocked for security
+CREATE POLICY "Allow public read access to migrations table"
+ON _migrations
+FOR SELECT
+TO public
+USING (true);
