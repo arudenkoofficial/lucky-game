@@ -58,58 +58,72 @@ export function SignUpForm({
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-2xl">Sign up</CardTitle>
-          <CardDescription>Create a new account</CardDescription>
+      <Card className="neon-card">
+        <CardHeader className="space-y-2">
+          <CardTitle className="text-4xl font-bold neon-text bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+            JOIN THE GAME
+          </CardTitle>
+          <CardDescription className="text-lg text-muted-foreground">
+            Create your lucky account
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignUp}>
             <div className="flex flex-col gap-6">
               <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-foreground/90">Email</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="player@luckygame.com"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  className="neon-border bg-card/50 focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                </div>
+                <Label htmlFor="password" className="text-foreground/90">Password</Label>
                 <Input
                   id="password"
                   type="password"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="neon-border bg-card/50 focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div className="grid gap-2">
-                <div className="flex items-center">
-                  <Label htmlFor="repeat-password">Repeat Password</Label>
-                </div>
+                <Label htmlFor="repeat-password" className="text-foreground/90">Confirm Password</Label>
                 <Input
                   id="repeat-password"
                   type="password"
                   required
                   value={repeatPassword}
                   onChange={(e) => setRepeatPassword(e.target.value)}
+                  className="neon-border bg-card/50 focus:ring-2 focus:ring-primary"
                 />
               </div>
-              {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating an account..." : "Sign up"}
+              {error && (
+                <div className="p-3 rounded-md bg-destructive/10 border border-destructive/50">
+                  <p className="text-sm text-destructive">{error}</p>
+                </div>
+              )}
+              <Button
+                type="submit"
+                className="w-full neon-glow bg-gradient-to-r from-secondary to-accent hover:from-secondary/80 hover:to-accent/80 text-secondary-foreground font-semibold text-lg py-6"
+                disabled={isLoading}
+              >
+                {isLoading ? "Joining Casino..." : "Start Playing"}
               </Button>
             </div>
-            <div className="mt-4 text-center text-sm">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="underline underline-offset-4">
-                Login
+            <div className="mt-6 text-center text-sm">
+              <span className="text-muted-foreground">Already a player?</span>{" "}
+              <Link
+                href="/auth/login"
+                className="text-accent hover:text-accent/80 font-semibold underline-offset-4 hover:underline"
+              >
+                Sign In
               </Link>
             </div>
           </form>
