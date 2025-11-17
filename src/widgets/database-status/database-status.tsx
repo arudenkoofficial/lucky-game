@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/shared/api/supabase';
-import { InfoIcon, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 
 export function DatabaseStatus() {
   const [status, setStatus] = useState<'checking' | 'ready' | 'needs-setup' | 'error'>('checking');
@@ -17,7 +17,7 @@ export function DatabaseStatus() {
       const supabase = createClient();
 
       // Try to query the _migrations table
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from('_migrations')
         .select('name')
         .limit(1);
@@ -36,9 +36,9 @@ export function DatabaseStatus() {
         setStatus('ready');
         setMessage('Database is ready');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       setStatus('error');
-      setMessage(`Connection error: ${error.message}`);
+      setMessage(`Connection error: ${(error as Error).message}`);
     }
   }
 
