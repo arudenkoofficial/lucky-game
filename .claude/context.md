@@ -210,7 +210,7 @@ updateSession() // Проверяет сессию, обновляет cookies
 Обязательно требуются:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-publishable-key
 ```
 
 
@@ -637,7 +637,7 @@ export async function GET() {
 1. **Настройте переменные окружения**:
    ```bash
    cp .env.example .env.local
-   # Заполните NEXT_PUBLIC_SUPABASE_URL и NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+   # Заполните NEXT_PUBLIC_SUPABASE_URL и NEXT_PUBLIC_SUPABASE_ANON_KEY
    ```
 
 2. **Выполните миграции**:
@@ -808,7 +808,7 @@ npx shadcn@latest add [component]  # Добавить UI компонент
 ```bash
 # .env.local (создайте файл)
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-anon-key
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 # Опционально: для автоматических миграций (development only)
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
@@ -817,7 +817,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 **Где найти ключи:**
 - Project Settings > API в Supabase Dashboard
 - `NEXT_PUBLIC_SUPABASE_URL` - Project URL
-- `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` - anon/public key
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - anon/public key
 - `SUPABASE_SERVICE_ROLE_KEY` - service_role key (держите в секрете!)
 
 ---

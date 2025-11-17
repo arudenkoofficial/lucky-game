@@ -49,7 +49,7 @@ code .env.local
 
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=https://your-project-id.supabase.co
-NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-anon-or-publishable-key
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-or-publishable-key
 ```
 
 **ВАЖНО**: Замените `your-project-id` и `your-anon-or-publishable-key` на реальные значения из Supabase Dashboard.
@@ -119,7 +119,7 @@ npm run dev
 
 **"Missing environment variables"**
 - Проверьте файл `.env.local`
-- Убедитесь, что `NEXT_PUBLIC_SUPABASE_URL` и `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` заполнены
+- Убедитесь, что `NEXT_PUBLIC_SUPABASE_URL` и `NEXT_PUBLIC_SUPABASE_ANON_KEY` заполнены
 - Перезапустите `npm run dev`
 
 **"Table already exists"**
