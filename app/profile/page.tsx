@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { createServerClient } from "@/shared/api/supabase";
+import { createClient as createServerClient } from "@/shared/api/supabase/server";
 import { UserProfile } from "@/widgets/user-profile";
 import { Button } from "@/shared/ui/button";
 import { ArrowLeft, Sparkles } from "lucide-react";

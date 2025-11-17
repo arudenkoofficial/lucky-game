@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Button } from "@/shared/ui/button";
 import { Trophy, Sparkles, Coins, Zap, Star, Gamepad2, Lock } from "lucide-react";
 import Link from "next/link";
-import { createServerClient } from "@/shared/api/supabase";
+import { createClient as createServerClient } from "@/shared/api/supabase/server";
 
 export default async function Home() {
   const supabase = await createServerClient();
