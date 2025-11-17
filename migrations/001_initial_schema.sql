@@ -277,7 +277,9 @@ END $$;
 -- ============================================================================
 
 -- View for spin results with symbol details
-CREATE OR REPLACE VIEW spin_results_view AS
+-- SECURITY INVOKER ensures RLS policies on underlying tables are respected
+CREATE OR REPLACE VIEW spin_results_view
+WITH (security_invoker = true) AS
 SELECT
   s.id,
   s.user_id,
@@ -292,7 +294,9 @@ FROM spins s
 LEFT JOIN user_profiles u ON s.user_id = u.id;
 
 -- View for user statistics
-CREATE OR REPLACE VIEW user_stats_view AS
+-- SECURITY INVOKER ensures RLS policies on underlying tables are respected
+CREATE OR REPLACE VIEW user_stats_view
+WITH (security_invoker = true) AS
 SELECT
   up.id,
   up.username,

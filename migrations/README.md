@@ -11,6 +11,8 @@ This directory contains SQL migration files that set up the database schema for 
    - `000_migrations_table.sql`
    - `001_initial_schema.sql`
    - `002_backfill_existing_users.sql` (only if you have existing users)
+   - `003_enable_rls_migrations_table.sql`
+   - `004_fix_view_security.sql` (CRITICAL - fixes security vulnerability)
 3. Paste into the SQL Editor and click **RUN**
 
 ## Migration Files
@@ -30,6 +32,23 @@ Creates user profiles for any existing authenticated users who don't have a prof
 - Is safe to run multiple times (uses `ON CONFLICT DO NOTHING`)
 
 **When to use:** If you're adding this migration system to an existing project with registered users, run this migration to ensure all users have profiles.
+
+### 003_enable_rls_migrations_table.sql
+Protects the internal migrations tracking table from public API access by enabling RLS without any policies. This ensures only the service_role can access it.
+
+### 004_fix_view_security.sql
+**CRITICAL SECURITY FIX** - Fixes security vulnerability in views.
+
+This migration addresses a critical security issue where `spin_results_view` and `user_stats_view` were bypassing Row Level Security (RLS) policies. Without this fix, all user data is publicly accessible via API.
+
+**What it fixes:**
+- Converts views to use `SECURITY INVOKER` instead of default `SECURITY DEFINER`
+- Ensures RLS policies on underlying tables (`spins`, `user_profiles`) are respected
+- Prevents unauthorized access to private spin data and statistics
+
+**Impact:**
+- Before: Anyone could query all users' spins, rewards, and statistics
+- After: Users can only see their own data, respecting RLS policies
 
 ## Database Schema
 
@@ -114,12 +133,16 @@ For optimized queries:
 #### spin_results_view
 Combines spin data with user information for easy querying.
 
+**Security:** Uses `SECURITY INVOKER` to respect RLS policies. Users can only see their own spin results.
+
 #### user_stats_view
 Aggregated user statistics:
 - Total spins
 - Successful spins (matches)
 - Total rewards
 - Best single reward
+
+**Security:** Uses `SECURITY INVOKER` to respect RLS policies. Users can only see their own statistics.
 
 ## Row Level Security (RLS)
 
